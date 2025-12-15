@@ -4,24 +4,15 @@
   <meta charset="UTF-8">
   <title>Phoenix AI StormFest 2025</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Phoenix AI StormFest — four days of workshops, hackathon and a concert night. University-driven techno-cultural movement in Nagpur.">
-  <meta name="theme-color" content="#000000">
-
+  <meta name="description" content="Phoenix AI StormFest — four days of workshops, hackathon and a concert night.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <a class="skip" href="#main">Skip to content</a>
-
-  <!-- Fire canvas (behind content) -->
-  <canvas id="fire" aria-hidden="true" role="presentation"></canvas>
-
-  <!-- Lightning canvas (behind content) -->
-  <canvas id="lightning" aria-hidden="true" role="presentation"></canvas>
 
   <!-- INTRO (dismissible) -->
   <div id="intro" aria-hidden="false">
@@ -43,10 +34,14 @@
       </nav>
     </header>
 
-    <!-- HERO with banner image -->
+    <!-- HERO with banner image and localized canvases inside hero-banner -->
     <section class="hero" aria-labelledby="hero-heading">
       <div class="hero-banner" role="img" aria-label="Rise & Reborn Festival banner">
         <img src="assets/images/banner.jpg" alt="Rise & Reborn Festival banner — phoenix artwork" />
+        <!-- canvases are now inside the hero and sized to it -->
+        <canvas id="fire" aria-hidden="true" role="presentation"></canvas>
+        <canvas id="lightning" aria-hidden="true" role="presentation"></canvas>
+
         <div class="hero-overlay">
           <h2 id="hero-heading">WHERE<br><span>INNOVATION</span><br>RISES</h2>
           <p>25–28 January 2025 · Nagpur</p>
