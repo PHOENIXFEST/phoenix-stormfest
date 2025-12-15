@@ -20,31 +20,58 @@ body {
   line-height: 1.4;
 }
 
-/* Canvas layers (fire and lightning) */
+/* Canvas layers: place behind content (z-index: 0). Transparent background only */
 canvas#fire,
 canvas#lightning {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 5;
+  z-index: 0;              /* canvases behind page content */
   pointer-events: none;
+  background: transparent;
 }
 
-/* Ensure lightning sits above fire */
-canvas#fire { z-index: 5; }
-canvas#lightning { z-index: 6; }
+/* Content layers must be above canvases */
+.topnav { z-index: 40; position: relative; }           /* nav above canvases */
+.hero { z-index: 10; position: relative; }             /* hero above canvases */
+.hero-overlay { z-index: 12; position: relative; }     /* overlay text sits above canvases */
+#main { z-index: 10; position: relative; }             /* main content above canvases */
+footer { z-index: 10; position: relative; }
+
+/* Intro overlay stays on top */
+#intro { z-index: 99; position: fixed; }
+
+/* Skip link */
+.skip {
+  position: absolute;
+  left: -999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.skip:focus {
+  left: 1rem;
+  top: 1rem;
+  width: auto;
+  height: auto;
+  background: #111;
+  color: var(--accent);
+  padding: 8px 12px;
+  z-index: 200;
+  border-radius: 4px;
+  text-decoration: none;
+}
 
 /* Intro overlay */
 #intro {
-  position: fixed;
   inset: 0;
   background: linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.96));
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 99;
 }
 #intro[aria-hidden="true"] { visibility: hidden; pointer-events: none; }
 #intro h1 {
@@ -71,7 +98,6 @@ canvas#lightning { z-index: 6; }
   padding: 14px 20px;
   max-width: var(--max-width);
   margin: 0 auto;
-  z-index: 10;
 }
 .logo { color: var(--accent); font-weight:700; text-decoration:none; }
 .nav-toggle { display:none; background:transparent; color:var(--accent); border:1px solid rgba(255,255,255,0.04); padding:6px 10px; border-radius:4px; }
@@ -84,7 +110,6 @@ canvas#lightning { z-index: 6; }
   justify-content:center;
   margin-bottom: 30px;
   position: relative;
-  z-index: 1;
 }
 .hero-banner {
   position: relative;
@@ -100,7 +125,6 @@ canvas#lightning { z-index: 6; }
   height:auto;
   object-fit: cover;
   filter: saturate(1.02) contrast(1.02);
-  transform-origin: center;
 }
 .hero-overlay {
   position: absolute;
@@ -112,7 +136,6 @@ canvas#lightning { z-index: 6; }
   background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.45));
   padding: 36px 20px;
   text-align:center;
-  z-index: 2;
 }
 .hero-overlay h2 {
   font-family: 'Orbitron', sans-serif;
@@ -146,7 +169,7 @@ a.primary, .buttons a {
 .section.dark { background: #050505; }
 .section h3 { font-family: 'Orbitron', sans-serif; margin-bottom: 20px; }
 
-/* Cards / common */
+/* Cards */
 .cards {
   display:flex;
   justify-content:center;
