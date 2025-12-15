@@ -1,209 +1,203 @@
-// Improved lightning canvas + accessible countdown + performance tweaks
-
-// --- Canvas Lightning Effect (requestAnimationFrame, DPR-aware, pause when not visible) ---
-const canvas = document.getElementById("lightning");
-const ctx = canvas.getContext("2d");
-let rafId = null;
-let lastStrike = 0;
-let nextStrikeIn = randomRange(800, 4500);
-let devicePixelRatio = Math.max(window.devicePixelRatio || 1, 1);
-
-function resizeCanvas() {
-  devicePixelRatio = Math.max(window.devicePixelRatio || 1, 1);
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  canvas.width = Math.floor(w * devicePixelRatio);
-  canvas.height = Math.floor(h * devicePixelRatio);
-  canvas.style.width = w + "px";
-  canvas.style.height = h + "px";
-  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-}
-resizeCanvas();
-
-let fading = 0.06; // background fade to create trails
-
-function randomRange(min, max) {
-  return Math.random() * (max - min) + min;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-// Draw a single lightning strike
-function drawStrike() {
-  const w = canvas.width / devicePixelRatio;
-  const h = canvas.height / devicePixelRatio;
-  ctx.beginPath();
-  ctx.strokeStyle = "rgba(125,249,255,0.9)";
-  ctx.lineWidth = 1.5;
-  let x = Math.random() * w;
-  let y = 0;
-  ctx.moveTo(x, y);
-  while (y < h) {
-    x += (Math.random() - 0.5) * 80;
-    y += randomRange(20, 60);
-    ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-
-  // occasional branches
-  if (Math.random() > 0.6) {
-    ctx.beginPath();
-    ctx.strokeStyle = "rgba(200,255,255,0.6)";
-    ctx.lineWidth = 1;
-    let bx = Math.random() * w;
-    let by = randomRange(h * 0.2, h * 0.6);
-    ctx.moveTo(bx, by);
-    for (let i = 0; i < 6; i++) {
-      bx += (Math.random() - 0.5) * 30;
-      by += randomRange(10, 40);
-      ctx.lineTo(bx, by);
-    }
-    ctx.stroke();
-  }
+:root{
+  --accent: #7df9ff;
+  --bg: #000;
+  --muted: #777;
+  --max-width: 1100px;
 }
 
-function step(timestamp) {
-  // fade previous frame (creates trailing/fade effect)
-  ctx.fillStyle = `rgba(0,0,0,${fading})`;
-  ctx.fillRect(0, 0, canvas.width / devicePixelRatio, canvas.height / devicePixelRatio);
-
-  if (!lastStrike) lastStrike = timestamp;
-  const elapsed = timestamp - lastStrike;
-  if (elapsed > nextStrikeIn) {
-    // simulate multiple quick flashes sometimes
-    const flashes = Math.random() > 0.75 ? Math.floor(randomRange(1, 4)) : 1;
-    for (let i = 0; i < flashes; i++) {
-      drawStrike();
-    }
-    lastStrike = timestamp;
-    nextStrikeIn = randomRange(1200, 6000);
-  }
-  rafId = requestAnimationFrame(step);
+/* Basic page */
+body {
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: var(--bg);
+  color: white;
+  overflow-x: hidden;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-// Start animation if visible
-function startLightning() {
-  if (!rafId) {
-    rafId = requestAnimationFrame(step);
-  }
+/* Skip link */
+.skip {
+  position: absolute;
+  left: -999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
-function stopLightning() {
-  if (rafId) {
-    cancelAnimationFrame(rafId);
-    rafId = null;
-  }
-}
-
-// Visibility handling to save CPU
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) stopLightning();
-  else startLightning();
-});
-
-// Debounced resize
-let resizeTimer;
-window.addEventListener("resize", () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    resizeCanvas();
-  }, 150);
-});
-
-// Respect prefers-reduced-motion
-const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-if (!prefersReduced) startLightning();
-
-// --- Intro dismiss (keyboard / click) ---
-const intro = document.getElementById("intro");
-const enterBtn = document.getElementById("intro-enter");
-function dismissIntro() {
-  if (!intro || intro.getAttribute("aria-hidden") === "true") return;
-  intro.setAttribute("aria-hidden", "true");
-  intro.style.transition = "opacity 400ms ease, visibility 400ms";
-  intro.style.opacity = 0;
-  setTimeout(() => {
-    intro.style.display = "none";
-    document.getElementById("main").focus();
-  }, 450);
-}
-if (enterBtn) {
-  enterBtn.addEventListener("click", dismissIntro);
-  enterBtn.addEventListener("keyup", (e) => {
-    if (e.key === "Enter" || e.key === " ") dismissIntro();
-  });
+.skip:focus {
+  left: 1rem;
+  top: 1rem;
+  width: auto;
+  height: auto;
+  background: #111;
+  color: var(--accent);
+  padding: 8px 12px;
+  z-index: 200;
+  border-radius: 4px;
+  text-decoration: none;
 }
 
-// --- Simple nav toggle for mobile ---
-const navToggle = document.querySelector(".nav-toggle");
-const navLinks = document.getElementById("nav-links");
-if (navToggle && navLinks) {
-  navToggle.addEventListener("click", () => {
-    const expanded = navToggle.getAttribute("aria-expanded") === "true";
-    navToggle.setAttribute("aria-expanded", String(!expanded));
-    if (expanded) {
-      navLinks.hidden = true;
-    } else {
-      navLinks.hidden = false;
-    }
-  });
+/* Canvas */
+canvas#lightning {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
-// --- Countdown (robust, handles past dates and updates via data-target attribute) ---
-const countdownEl = document.getElementById("countdown");
-let countdownTimer = null;
+/* Intro overlay */
+#intro {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.96));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 99;
+}
+#intro[aria-hidden="true"] { visibility: hidden; pointer-events: none; }
+#intro h1 {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 5px;
+  font-size: clamp(2rem, 6vw, 3rem);
+}
+#intro p { color: var(--accent); margin: 8px 0 18px; }
+#intro #intro-enter {
+  padding: 10px 18px;
+  border: none;
+  background: var(--accent);
+  color: black;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#intro #intro-enter:focus { outline: 3px solid rgba(125,249,255,0.25); }
 
-function parseTarget(el) {
-  const targetAttr = el?.dataset?.target;
-  if (targetAttr) {
-    const parsed = Date.parse(targetAttr);
-    if (!isNaN(parsed)) return parsed;
-  }
-  // fallback original date (kept for backwards compatibility)
-  return Date.parse("Jan 25, 2025 09:00:00 GMT");
+/* Top nav */
+.topnav {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding: 14px 20px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  z-index: 10;
+}
+.logo { color: var(--accent); font-weight:700; text-decoration:none; }
+.nav-toggle { display:none; background:transparent; color:var(--accent); border:1px solid rgba(255,255,255,0.04); padding:6px 10px; border-radius:4px; }
+
+/* HERO */
+.hero {
+  min-height: 80vh;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: radial-gradient(circle at top, #1a1a2e, black);
+  padding: 40px 20px;
+  z-index: 1;
+}
+.hero h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 8vw, 3rem);
+  line-height:1.05;
+}
+.hero span { color: var(--accent); }
+.hero p { margin-top: 10px; color: var(--muted); }
+
+/* Buttons */
+.buttons {
+  margin-top: 20px;
+}
+a.primary, .buttons a {
+  display:inline-block;
+  padding: 12px 26px;
+  margin: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  background: var(--accent);
+  color: black;
+  border-radius: 8px;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+a.primary:focus, .buttons a:focus { outline:3px solid rgba(125,249,255,0.2); }
+a.primary:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(125,249,255,0.12); }
+
+.buttons .outline {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
 }
 
-function formatTime(diff) {
-  const abs = Math.abs(diff);
-  const d = Math.floor(abs / (1000 * 60 * 60 * 24));
-  const h = Math.floor((abs / (1000 * 60 * 60)) % 24);
-  const m = Math.floor((abs / (1000 * 60)) % 60);
-  const s = Math.floor((abs / 1000) % 60);
-  return { d, h, m, s };
+/* SECTIONS */
+.section {
+  padding: 64px 20px;
+  text-align: center;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+.section.dark { background: #050505; }
+.section h3 { font-family: 'Orbitron', sans-serif; margin-bottom: 20px; font-size: clamp(1.25rem, 4vw, 1.8rem); }
+
+/* Cards */
+.cards {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.card {
+  border: 1px solid var(--accent);
+  padding: 22px;
+  width: 220px;
+  transition: transform .18s ease, box-shadow .18s ease;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.15));
+  border-radius: 8px;
+}
+.card span { color: var(--accent); }
+.card:hover, .card:focus-within { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(125,249,255,0.08); }
+
+/* COUNTDOWN */
+#countdown {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  color: var(--accent);
 }
 
-function updateCountdown() {
-  if (!countdownEl) return;
-  const target = parseTarget(countdownEl);
-  const now = Date.now();
-  const diff = target - now;
-
-  if (diff <= 0) {
-    // Event is in the past
-    const { d, h, m, s } = formatTime(diff);
-    // Show friendly message (how long ago)
-    countdownEl.textContent = `Event has ended (${d}d ${h}h ${m}m ${s}s ago)`;
-    clearInterval(countdownTimer);
-    return;
-  }
-  const { d, h, m, s } = formatTime(diff);
-  countdownEl.textContent = `${d}d ${h}h ${m}m ${s}s`;
+/* Iframe wrapper (responsive) */
+.iframe-wrap {
+  max-width: 900px;
+  margin: 18px auto 0;
+  background: #050505;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
 }
 
-// start countdown and keep it efficient (pause on tab hidden)
-function startCountdown() {
-  updateCountdown();
-  if (countdownTimer) clearInterval(countdownTimer);
-  countdownTimer = setInterval(() => {
-    if (!document.hidden) updateCountdown();
-  }, 1000);
+/* FOOTER */
+footer {
+  padding: 20px;
+  text-align: center;
+  background: transparent;
+  color: var(--muted);
 }
-startCountdown();
 
-// Pause intervals when page is hidden to save CPU
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    if (countdownTimer) clearInterval(countdownTimer);
-    stopLightning();
-  } else {
-    startCountdown();
-    if (!prefersReduced) startLightning();
-  }
-});
+/* Accessibility & focus */
+a:focus, button:focus { outline: 3px solid rgba(125,249,255,0.15); outline-offset: 2px; }
+:focus:not(:focus-visible) { outline: none; }
+
+/* Responsive adjustments */
+@media (max-width: 720px) {
+  .nav-toggle { display:block; }
+  .nav-links { display:flex; flex-direction:column; gap:8px; }
+  .card { width: 100%; max-width: 300px; }
+  .hero { min-height: 60vh; }
+}
