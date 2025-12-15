@@ -11,6 +11,13 @@ body {
   overflow-x: hidden;
 }
 
+canvas#lightning {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
 /* INTRO */
 #intro {
   position: fixed;
@@ -20,21 +27,21 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 999;
-  animation: fadeOut 3s forwards;
+  z-index: 99;
+  animation: introFade 3s forwards;
 }
 
 #intro h1 {
   font-family: 'Orbitron', sans-serif;
+  letter-spacing: 5px;
   font-size: 3rem;
-  letter-spacing: 4px;
 }
 
 #intro p {
   color: #7df9ff;
 }
 
-@keyframes fadeOut {
+@keyframes introFade {
   0% {opacity: 1;}
   80% {opacity: 1;}
   100% {opacity: 0; visibility: hidden;}
@@ -43,11 +50,10 @@ body {
 /* HERO */
 .hero {
   height: 100vh;
+  text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  text-align: center;
   background: radial-gradient(circle at top, #1a1a2e, black);
 }
 
@@ -61,16 +67,16 @@ body {
 }
 
 .buttons {
-  margin-top: 30px;
+  margin-top: 25px;
 }
 
 .buttons a {
-  margin: 10px;
-  padding: 12px 25px;
+  padding: 12px 28px;
+  margin: 8px;
   text-decoration: none;
-  color: black;
-  background: #7df9ff;
   font-weight: bold;
+  background: #7df9ff;
+  color: black;
 }
 
 .buttons .outline {
@@ -85,13 +91,13 @@ body {
   text-align: center;
 }
 
+.section.dark {
+  background: #0a0a0a;
+}
+
 .section h3 {
   font-family: 'Orbitron', sans-serif;
   margin-bottom: 20px;
-}
-
-.section.dark {
-  background: #0a0a0a;
 }
 
 .cards {
@@ -105,17 +111,22 @@ body {
   border: 1px solid #7df9ff;
   padding: 30px;
   width: 200px;
+  transition: 0.3s;
 }
 
-/* CTA */
-.cta {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 15px 30px;
-  background: #7df9ff;
-  color: black;
-  text-decoration: none;
-  font-weight: bold;
+.card span {
+  color: #7df9ff;
+}
+
+.card:hover {
+  box-shadow: 0 0 20px #7df9ff;
+}
+
+/* COUNTDOWN */
+#countdown {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2rem;
+  color: #7df9ff;
 }
 
 /* FOOTER */
