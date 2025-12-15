@@ -1,52 +1,170 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Phoenix AI StormFest 2025</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Inter&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PHOENIX AI StormFest — 25–28 Jan 2026</title>
+  <meta name="description" content="PHOENIX AI StormFest — a four-day techno-cultural festival at GH Raisoni Skill Tech University Nagpur. Workshops, 24hr Hackathon, cultural shows & a grand concert." />
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" href="/assets/favicon.png">
 </head>
 <body>
-
-<section class="hero">
-  <div class="overlay"></div>
-
-  <div class="hero-content">
-    <h1>
-      WHERE<br>
-      <span>INNOVATION</span><br>
-      RISES
-    </h1>
-
-    <p>25 – 28 January 2025 · Nagpur</p>
-
-    <div class="hero-buttons">
-      <a href="#register" class="btn primary">ENTER THE STORM</a>
-      <a href="#sponsor" class="btn outline">BECOME A SPONSOR</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#">
+        <img src="/assets/logo.png" alt="Phoenix StormFest logo" class="brand-logo">
+        <span class="brand-text">PHOENIX AI StormFest</span>
+      </a>
+      <button class="nav-toggle" aria-controls="main-nav" aria-expanded="false">Menu</button>
     </div>
-  </div>
-</section>
+  </header>
 
-<section id="register" class="section">
-  <h2>Register</h2>
-  <iframe
-    src="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?embedded=true"
-    width="100%"
-    height="600"
-    frameborder="0">
-  </iframe>
-</section>
+  <main id="main">
+    <section class="hero">
+      <div class="hero-overlay"></div>
+      <div class="hero-inner container">
+        <img class="hero-logo" src="/assets/logo.png" alt="Thunder Phoenix logo">
+        <h1 class="hero-title">PHOENIX AI StormFest</h1>
+        <p class="hero-sub">Rebirth through innovation — 25–28 Jan 2026 · GH Raisoni Skill Tech University, Nagpur</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#tickets">Get Tickets</a>
+          <a class="btn btn-secondary" href="#lineup">See Lineup</a>
+        </div>
+        <div class="countdown" aria-live="polite" id="countdown">Loading countdown…</div>
+      </div>
+    </section>
 
-<section id="sponsor" class="section dark">
-  <h2>Sponsorship</h2>
-  <p>Partner with innovation. Shape the future.</p>
-</section>
+    <section id="highlights" class="container section">
+      <h2>Why people will talk</h2>
+      <ul class="highlights-grid">
+        <li><strong>Immersive Workshops</strong><span>AI, cybersecurity, and emerging tech sessions</span></li>
+        <li><strong>24-hour Hackathon</strong><span>Prototype, pitch, and win — nonstop innovation</span></li>
+        <li><strong>Grand Concert</strong><span>Students, culture, and headline music performances</span></li>
+        <li><strong>On-site Experiences</strong><span>Art, food streets, and surprise activations</span></li>
+      </ul>
+    </section>
 
-<footer>
-  © 2025 Phoenix AI StormFest · GH Raisoni, Nagpur
-</footer>
+    <section id="lineup" class="container section">
+      <h2>Lineup & Highlights</h2>
+      <p class="muted">(Snapshot — full lineup coming soon)</p>
+      <div class="cards">
+        <article class="card">
+          <h3>Mystery Keynote</h3>
+          <p>Special guest speaker on AI & ethics (reveal soon)</p>
+        </article>
+        <article class="card">
+          <h3>Hackathon Finals</h3>
+          <p>Top teams present live — prizes & mentorship</p>
+        </article>
+        <article class="card">
+          <h3>Grand Concert</h3>
+          <p>Evening headline performance and cultural showcases</p>
+        </article>
+      </div>
+    </section>
 
+    <section id="schedule" class="container section">
+      <h2>Schedule</h2>
+      <div class="schedule-grid">
+        <div class="day">
+          <h4>Day 1 — Workshops</h4>
+          <p>Expert-led sessions on AI, cybersecurity, and emerging tech.</p>
+        </div>
+        <div class="day">
+          <h4>Day 2 & 3 — Hackathon</h4>
+          <p>24-hour innovation challenge, prototype development, and jury evaluation.</p>
+        </div>
+        <div class="day">
+          <h4>Day 4 — Cultural & Concert</h4>
+          <p>Student activities, competitions, and the grand musical concert.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="sponsors" class="container section">
+      <h2>Partner with us</h2>
+      <p class="muted">Sponsorship tiers available — download brochure or contact us.</p>
+      <div class="sponsor-grid">
+        <div class="sponsor-card">
+          <h3>Diamond — ₹150,000</h3>
+          <ul>
+            <li>Title-level branding & prime placement</li>
+            <li>On-stage acknowledgements</li>
+            <li>4 social posts + 6 stories</li>
+            <li>6 complimentary passes</li>
+          </ul>
+        </div>
+        <div class="sponsor-card">
+          <h3>Platinum — ₹100,000</h3>
+          <ul>
+            <li>Prime logo placement</li>
+            <li>3 social posts + 4 stories</li>
+            <li>4 passes</li>
+          </ul>
+        </div>
+        <div class="sponsor-card">
+          <h3>Gold — ₹75,000</h3>
+          <ul>
+            <li>Booth space & branding</li>
+            <li>2 posts + 5 stories</li>
+            <li>3 passes</li>
+          </ul>
+        </div>
+      </div>
+      <p class="cta-row"><a class="btn btn-primary" href="mailto:phoenixaiherstu@gmail.com">Contact Partnerships</a> <a class="btn btn-outline" href="/assets/sponsorship-brochure.pdf">Download brochure (PDF)</a></p>
+    </section>
+
+    <section id="tickets" class="container section">
+      <h2>Tickets</h2>
+      <p class="muted">Ticketing opens soon. Link to Eventbrite / checkout will be available here.</p>
+      <div class="tickets-grid">
+        <div class="ticket">
+          <h4>Early Bird</h4>
+          <p>Limited passes — benefits & discounts</p>
+          <a class="btn btn-primary" href="#">Buy Tickets</a>
+        </div>
+        <div class="ticket">
+          <h4>General</h4>
+          <p>Full access pass (3-day)</p>
+          <a class="btn btn-primary" href="#">Buy Tickets</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="container section">
+      <h2>Contact & Join</h2>
+      <p class="muted">Questions? Partnership requests? Drop us a message.</p>
+
+      <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="contact-form">
+        <input type="hidden" name="form-name" value="contact">
+        <p class="hidden"><label>Don’t fill this out: <input name="bot-field"></label></p>
+        <label>
+          Name
+          <input type="text" name="name" required>
+        </label>
+        <label>
+          Email
+          <input type="email" name="email" required>
+        </label>
+        <label>
+          Message
+          <textarea name="message" rows="4" required></textarea>
+        </label>
+        <p class="form-actions"><button class="btn btn-primary" type="submit">Send message</button></p>
+      </form>
+
+      <p class="muted">Or email us at <a href="mailto:phoenixaiherstu@gmail.com">phoenixaiherstu@gmail.com</a></p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© PHOENIX AI StormFest — GH Raisoni Skill Tech University Nagpur</p>
+      <p><a href="/privacy.html">Privacy & Terms</a></p>
+    </div>
+  </footer>
+
+  <script src="/scripts.js"></script>
 </body>
 </html>
