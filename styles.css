@@ -1,51 +1,127 @@
-/* Simple responsive dark theme styles for the PHOENIX AI StormFest prototype */
-:root{
-  --bg:#050505;
-  --card:#0e0e0e;
-  --muted:#bfbfbf;
-  --accent:#ff4d4f; /* bold accent — tweak to match brand */
-  --glass: rgba(255,255,255,0.03);
-  --max-width:1100px;
-  --radius:10px;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; background:var(--bg); color:#fff; -webkit-font-smoothing:antialiased}
-.container{max-width:var(--max-width);margin:0 auto;padding:24px}
-.site-header{position:sticky;top:0;background:linear-gradient(180deg,rgba(0,0,0,0.6),transparent);backdrop-filter:blur(4px);z-index:40}
-.header-inner{display:flex;align-items:center;justify-content:space-between}
-.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
-.brand-logo{height:44px}
-.brand-text{font-weight:700;letter-spacing:0.6px}
-.nav-toggle{background:transparent;border:1px solid rgba(255,255,255,0.08);color:var(--muted);padding:8px 12px;border-radius:8px}
-.hero{min-height:72vh;display:flex;align-items:center;color:#fff;position:relative;padding:48px 0}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.45),rgba(0,0,0,0.6))}
-.hero-inner{position:relative;z-index:2;text-align:center}
-.hero-logo{height:120px;margin-bottom:12px;filter:drop-shadow(0 6px 18px rgba(0,0,0,0.6))}
-.hero-title{font-size:clamp(28px,5vw,48px);margin:6px 0}
-.hero-sub{color:var(--muted);margin-bottom:18px}
-.btn{display:inline-block;padding:10px 18px;border-radius:8px;text-decoration:none}
-.btn-primary{background:linear-gradient(90deg,var(--accent),#ff7a76);color:#111;font-weight:700}
-.btn-secondary{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff}
-.countdown{margin-top:18px;font-weight:700;background:var(--glass);display:inline-block;padding:8px 12px;border-radius:8px}
-.section{padding:40px 0}
-.highlights-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;list-style:none;padding:0;margin:0}
-.highlights-grid li{background:var(--card);padding:16px;border-radius:10px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:16px;border-radius:10px}
-.schedule-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.sponsor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.sponsor-card{background:var(--card);padding:14px;border-radius:10px}
-.tickets-grid{display:flex;gap:12px;flex-wrap:wrap}
-.ticket{background:var(--card);padding:12px;border-radius:8px}
-.contact-form{max-width:640px}
-.contact-form label{display:block;margin-bottom:10px}
-.contact-form input,.contact-form textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff}
-.form-actions{margin-top:8px}
-.site-footer{padding:24px 0;border-top:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-.muted{color:var(--muted)}
-.hidden{position:absolute;left:-9999px}
-@media(max-width:720px){
-  .hero-inner{padding:0 12px}
-  .brand-logo{height:36px}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: black;
+  color: white;
+  overflow-x: hidden;
+}
+
+/* INTRO */
+#intro {
+  position: fixed;
+  inset: 0;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  animation: fadeOut 3s forwards;
+}
+
+#intro h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem;
+  letter-spacing: 4px;
+}
+
+#intro p {
+  color: #7df9ff;
+}
+
+@keyframes fadeOut {
+  0% {opacity: 1;}
+  80% {opacity: 1;}
+  100% {opacity: 0; visibility: hidden;}
+}
+
+/* HERO */
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: radial-gradient(circle at top, #1a1a2e, black);
+}
+
+.hero h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem;
+}
+
+.hero span {
+  color: #7df9ff;
+}
+
+.buttons {
+  margin-top: 30px;
+}
+
+.buttons a {
+  margin: 10px;
+  padding: 12px 25px;
+  text-decoration: none;
+  color: black;
+  background: #7df9ff;
+  font-weight: bold;
+}
+
+.buttons .outline {
+  background: transparent;
+  color: #7df9ff;
+  border: 1px solid #7df9ff;
+}
+
+/* SECTIONS */
+.section {
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.section h3 {
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 20px;
+}
+
+.section.dark {
+  background: #0a0a0a;
+}
+
+.cards {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.card {
+  border: 1px solid #7df9ff;
+  padding: 30px;
+  width: 200px;
+}
+
+/* CTA */
+.cta {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 15px 30px;
+  background: #7df9ff;
+  color: black;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* FOOTER */
+footer {
+  padding: 20px;
+  text-align: center;
+  background: black;
+  color: #777;
 }
