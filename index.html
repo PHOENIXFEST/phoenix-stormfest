@@ -2,42 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Phoenix AI StormFest 2025</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- INTRO -->
-<div id="intro">
-  <h1>PHOENIX AI</h1>
-  <p>StormFest 2025</p>
-</div>
+<canvas id="lightning"></canvas>
 
 <!-- HERO -->
 <section class="hero">
-  <h2>WHERE<br><span>INNOVATION</span><br>RISES</h2>
-  <p>25–28 January 2025 · Nagpur</p>
+  <h1>PHOENIX AI</h1>
+  <h2>STORMFEST 2025</h2>
+  <p>25–28 January · Nagpur</p>
+
+  <div id="countdown"></div>
+
   <div class="buttons">
-    <a href="#register">ENTER THE STORM</a>
-    <a href="#sponsor" class="outline">BECOME A SPONSOR</a>
+    <a href="#register">REGISTER</a>
+    <a href="#about" class="outline">EXPLORE</a>
   </div>
 </section>
 
 <!-- ABOUT -->
-<section class="section">
-  <h3>The Storm Begins</h3>
+<section class="section" id="about">
+  <h3>The Storm</h3>
   <p>
-    Phoenix StormFest is a university-driven techno-cultural movement.
-    A convergence of innovation, competition, learning, and music —
-    built by students, powered by vision.
+    Phoenix StormFest is a student-driven techno-cultural movement.
+    Innovation, hackathons, workshops, and a grand concert —
+    united into one unforgettable experience.
   </p>
 </section>
 
 <!-- EVENTS -->
 <section class="section dark">
-  <h3>Four Days. One Storm.</h3>
+  <h3>Event Lineup</h3>
   <div class="cards">
     <div class="card">Day 1<br><span>Workshops</span></div>
     <div class="card">Day 2–3<br><span>Hackathon</span></div>
@@ -45,23 +46,21 @@
   </div>
 </section>
 
-<!-- SPONSOR -->
-<section class="section" id="sponsor">
-  <h3>Partner With Power</h3>
-  <p>
-    Align your brand with youth, technology, and innovation.
-    Be remembered as part of the legacy.
-  </p>
-</section>
-
 <!-- REGISTER -->
-<section class="section dark" id="register">
-  <h3>Join the Storm</h3>
-  <a class="cta" href="#">Register Now</a>
+<section class="section" id="register">
+  <h3>Register for the Storm</h3>
+
+  <!-- 🔴 REPLACE YOUR_FORM_ID ONLY -->
+  <iframe
+    src="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?embedded=true"
+    width="100%"
+    height="600"
+    frameborder="0">
+  </iframe>
 </section>
 
 <footer>
-  <p>© 2025 Phoenix AI StormFest · GH Raisoni, Nagpur</p>
+  © 2025 Phoenix AI StormFest · GH Raisoni, Nagpur
 </footer>
 
 <script src="script.js"></script>
