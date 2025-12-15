@@ -1,22 +1,17 @@
 // Combined script with fire -> storm sequence + countdown + UI
-// Controls:
-// - FIRE_DELAY_MS: delay after load before showing fire
-// - FIRE_DURATION_MS: how long the fire effect runs before storm starts
-// - STORM_AFTER_FIRE: if true, storm (lightning) starts after fire
-// Respects prefers-reduced-motion and pauses when tab hidden.
+// Important fixes: canvases are behind content (CSS), stopFire clears canvas (no opaque fill)
 
 const FIRE_DELAY_MS = 8000;      // wait 8s then start fire
 const FIRE_DURATION_MS = 6000;   // run fire for 6s
-const STORM_AFTER_FIRE = true;   // start lightning after fire finishes
+const STORM_AFTER_FIRE = true;   // start lightning after fire
 
-// Canvas elements
 const fireCanvas = document.getElementById('fire');
 const lightningCanvas = document.getElementById('lightning');
 
-// Global flags & DPR handling
 let dpr = Math.max(window.devicePixelRatio || 1, 1);
 function resizeCanvas(canvas) {
   if (!canvas) return;
+  dpr = Math.max(window.devicePixelRatio || 1, 1);
   const w = window.innerWidth;
   const h = window.innerHeight;
   canvas.width = Math.floor(w * dpr);
@@ -26,35 +21,26 @@ function resizeCanvas(canvas) {
   const ctx = canvas.getContext('2d');
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-
-// Initialize canvases
 if (fireCanvas) resizeCanvas(fireCanvas);
 if (lightningCanvas) resizeCanvas(lightningCanvas);
 
-// --- Respect prefers-reduced-motion ---
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (prefersReduced) {
-  // Do not run animated canvases
   if (fireCanvas) fireCanvas.style.display = 'none';
   if (lightningCanvas) lightningCanvas.style.display = 'none';
 }
 
-// Pause behavior on hidden tab
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     stopFire();
     stopLightning();
   } else {
-    // if animations should be running, resume or re-trigger as appropriate.
-    // we won't auto-resume the fire sequence; lightning may resume if active.
-    if (lightningActive && !prefersReduced) startLightning(); // resume lightning
+    if (lightningActive && !prefersReduced) startLightning();
   }
 });
 
-// Debounced resize
 let resizeTimer;
 window.addEventListener('resize', () => {
-  dpr = Math.max(window.devicePixelRatio || 1, 1);
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     if (fireCanvas) resizeCanvas(fireCanvas);
@@ -62,9 +48,7 @@ window.addEventListener('resize', () => {
   }, 120);
 });
 
-/* ---------------------------
-   FIRE: lightweight particle system
-   --------------------------- */
+/* FIRE system */
 let fireCtx = fireCanvas ? fireCanvas.getContext('2d') : null;
 let fireAnimId = null;
 let fireParticles = [];
@@ -72,14 +56,13 @@ let fireRunning = false;
 
 function createFireParticle(x, y) {
   return {
-    x,
-    y,
+    x, y,
     vx: (Math.random() - 0.5) * 0.6,
     vy: - (Math.random() * 1.6 + 0.8),
     life: Math.random() * 1.2 + 0.6,
     age: 0,
     size: Math.random() * 18 + 8,
-    hue: Math.random() * 30 + 20 // warm color range
+    hue: Math.random() * 30 + 20
   };
 }
 
@@ -88,21 +71,19 @@ function stepFire(dt) {
   const w = fireCanvas.width / dpr;
   const h = fireCanvas.height / dpr;
 
-  // fade background gently
+  // gentle clear (low alpha) to create trails
   fireCtx.fillStyle = 'rgba(0,0,0,0.25)';
   fireCtx.fillRect(0, 0, w, h);
 
-  // spawn particles along bottom center
-  const spawnRate = 6; // per frame approx
+  // spawn
+  const spawnRate = 6;
   for (let i = 0; i < spawnRate; i++) {
     const px = w * (0.45 + Math.random() * 0.1);
     const py = h * (0.9 + Math.random() * 0.05);
     fireParticles.push(createFireParticle(px, py));
-    // limit
     if (fireParticles.length > 800) fireParticles.shift();
   }
 
-  // update & draw
   for (let i = fireParticles.length - 1; i >= 0; i--) {
     const p = fireParticles[i];
     p.age += dt;
@@ -116,9 +97,7 @@ function stepFire(dt) {
     const alpha = (1 - t) * 0.9;
     const size = p.size * (1 + t * 0.6);
 
-    // gradient circle
     const grad = fireCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size);
-    // color stops: yellow -> orange -> red -> transparent
     const hue = Math.floor(p.hue);
     grad.addColorStop(0, `hsla(${hue}, 100%, 65%, ${alpha})`);
     grad.addColorStop(0.4, `hsla(${hue + 20}, 90%, 50%, ${alpha * 0.7})`);
@@ -138,7 +117,7 @@ let lastFireTime = 0;
 function fireLoop(timestamp) {
   if (!fireRunning) return;
   if (!lastFireTime) lastFireTime = timestamp;
-  const dt = Math.min((timestamp - lastFireTime) / 1000, 0.05); // seconds
+  const dt = Math.min((timestamp - lastFireTime) / 1000, 0.05);
   lastFireTime = timestamp;
   stepFire(dt);
   fireAnimId = requestAnimationFrame(fireLoop);
@@ -149,7 +128,6 @@ function startFire() {
   fireRunning = true;
   fireParticles = [];
   lastFireTime = 0;
-  // clear canvas initially
   fireCtx.clearRect(0, 0, fireCanvas.width / dpr, fireCanvas.height / dpr);
   fireAnimId = requestAnimationFrame(fireLoop);
 }
@@ -161,18 +139,14 @@ function stopFire() {
     cancelAnimationFrame(fireAnimId);
     fireAnimId = null;
   }
-  // smooth fade out
+  // CLEAR canvas now (do not paint an opaque rectangle)
   if (fireCtx && fireCanvas) {
-    const w = fireCanvas.width / dpr;
-    const h = fireCanvas.height / dpr;
-    fireCtx.fillStyle = 'rgba(0,0,0,0.8)';
-    fireCtx.fillRect(0, 0, w, h);
+    fireCtx.clearRect(0, 0, fireCanvas.width / dpr, fireCanvas.height / dpr);
+    fireParticles = [];
   }
 }
 
-/* ---------------------------
-   LIGHTNING: improved from earlier code (start only when triggered)
-   --------------------------- */
+/* LIGHTNING system */
 let ctx = lightningCanvas ? lightningCanvas.getContext('2d') : null;
 let lightningRaf = null;
 let lastStrike = 0;
@@ -196,7 +170,6 @@ function drawLightningStrike() {
   }
   ctx.stroke();
 
-  // occasional branching
   if (Math.random() > 0.6) {
     ctx.beginPath();
     ctx.strokeStyle = "rgba(200,255,255,0.6)";
@@ -215,7 +188,6 @@ function drawLightningStrike() {
 
 function lightningStep(timestamp) {
   if (!ctx || !lightningCanvas) return;
-  // fade previous frame
   ctx.fillStyle = 'rgba(0,0,0,0.08)';
   ctx.fillRect(0, 0, lightningCanvas.width / dpr, lightningCanvas.height / dpr);
 
@@ -249,28 +221,19 @@ function stopLightning() {
   }
 }
 
-/* ---------------------------
-   Sequence: Fire -> Storm
-   --------------------------- */
+/* Sequence: Fire -> Storm */
 function runSequence() {
-  if (prefersReduced) return; // don't auto-trigger if user prefers reduced motion
-  // schedule fire
-  setTimeout(async () => {
-    // show fire
+  if (prefersReduced) return;
+  setTimeout(() => {
     startFire();
-    // after FIRE_DURATION_MS stop fire and possibly start storm
     setTimeout(() => {
       stopFire();
-      if (STORM_AFTER_FIRE) {
-        startLightning();
-      }
+      if (STORM_AFTER_FIRE) startLightning();
     }, FIRE_DURATION_MS);
   }, FIRE_DELAY_MS);
 }
 
-// Start lightning only on demand if you want (previously auto-started). We'll run the sequenced version.
 if (!prefersReduced) {
-  // make sure lightning canvas is cleared and sized
   if (lightningCanvas) {
     resizeCanvas(lightningCanvas);
     ctx && ctx.clearRect(0, 0, lightningCanvas.width / dpr, lightningCanvas.height / dpr);
@@ -279,13 +242,10 @@ if (!prefersReduced) {
     resizeCanvas(fireCanvas);
     fireCtx && fireCtx.clearRect(0, 0, fireCanvas.width / dpr, fireCanvas.height / dpr);
   }
-  // Start sequence
   runSequence();
 }
 
-/* ---------------------------
-   Countdown (unchanged & robust)
-   --------------------------- */
+/* Countdown */
 const countdown = document.getElementById('countdown');
 let countdownTimer = null;
 
@@ -332,9 +292,7 @@ function startCountdown() {
 }
 startCountdown();
 
-/* ---------------------------
-   Intro behavior & register open
-   --------------------------- */
+/* Intro & register open */
 const intro = document.getElementById('intro');
 const enterBtn = document.getElementById('intro-enter');
 
@@ -354,7 +312,6 @@ function openRegisterAndDismiss() {
   const registerUrl = 'register.html';
   const win = window.open(registerUrl, '_blank', 'noopener');
   if (!win) {
-    // popup blocked — fallback to same tab
     window.location.href = registerUrl;
   }
   dismissIntro();
@@ -367,9 +324,7 @@ if (enterBtn) {
   });
 }
 
-/* ---------------------------
-   Mobile nav toggle (unchanged)
-   --------------------------- */
+/* Mobile nav toggle */
 const navToggle = document.querySelector('.nav-toggle');
 const navLinks = document.getElementById('nav-links');
 if (navToggle && navLinks) {
