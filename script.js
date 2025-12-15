@@ -1,54 +1,51 @@
-// Combined script with fire -> storm sequence + countdown + UI
-// Important fixes: canvases are behind content (CSS), stopFire clears canvas (no opaque fill)
+// HERO-localized fire -> storm sequence
+// Canvases are inside .hero-banner and sized to that element (ResizeObserver used).
+// Adjust timing as needed.
 
-const FIRE_DELAY_MS = 8000;      // wait 8s then start fire
-const FIRE_DURATION_MS = 6000;   // run fire for 6s
-const STORM_AFTER_FIRE = true;   // start lightning after fire
+const FIRE_DELAY_MS = 8000;
+const FIRE_DURATION_MS = 6000;
+const STORM_AFTER_FIRE = true;
 
-const fireCanvas = document.getElementById('fire');
-const lightningCanvas = document.getElementById('lightning');
+const heroBanner = document.querySelector('.hero-banner');
+const fireCanvas = heroBanner?.querySelector('#fire') ?? null;
+const lightningCanvas = heroBanner?.querySelector('#lightning') ?? null;
 
 let dpr = Math.max(window.devicePixelRatio || 1, 1);
-function resizeCanvas(canvas) {
-  if (!canvas) return;
+function resizeToHero(canvas) {
+  if (!canvas || !heroBanner) return;
   dpr = Math.max(window.devicePixelRatio || 1, 1);
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  canvas.width = Math.floor(w * dpr);
-  canvas.height = Math.floor(h * dpr);
-  canvas.style.width = `${w}px`;
-  canvas.style.height = `${h}px`;
+  const rect = heroBanner.getBoundingClientRect();
+  const w = Math.max(1, Math.floor(rect.width * dpr));
+  const h = Math.max(1, Math.floor(rect.height * dpr));
+  canvas.width = w;
+  canvas.height = h;
+  canvas.style.width = `${rect.width}px`;
+  canvas.style.height = `${rect.height}px`;
   const ctx = canvas.getContext('2d');
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-if (fireCanvas) resizeCanvas(fireCanvas);
-if (lightningCanvas) resizeCanvas(lightningCanvas);
 
+// initial resize and keep in sync
+if (fireCanvas) resizeToHero(fireCanvas);
+if (lightningCanvas) resizeToHero(lightningCanvas);
+
+if (heroBanner && (fireCanvas || lightningCanvas)) {
+  // observe size changes of the hero banner
+  const ro = new ResizeObserver(() => {
+    if (fireCanvas) resizeToHero(fireCanvas);
+    if (lightningCanvas) resizeToHero(lightningCanvas);
+  });
+  ro.observe(heroBanner);
+}
+
+// respect reduced motion
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (prefersReduced) {
   if (fireCanvas) fireCanvas.style.display = 'none';
   if (lightningCanvas) lightningCanvas.style.display = 'none';
 }
 
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    stopFire();
-    stopLightning();
-  } else {
-    if (lightningActive && !prefersReduced) startLightning();
-  }
-});
-
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    if (fireCanvas) resizeCanvas(fireCanvas);
-    if (lightningCanvas) resizeCanvas(lightningCanvas);
-  }, 120);
-});
-
-/* FIRE system */
+/* ---------- FIRE (localized to hero) ---------- */
 let fireCtx = fireCanvas ? fireCanvas.getContext('2d') : null;
 let fireAnimId = null;
 let fireParticles = [];
@@ -57,8 +54,8 @@ let fireRunning = false;
 function createFireParticle(x, y) {
   return {
     x, y,
-    vx: (Math.random() - 0.5) * 0.6,
-    vy: - (Math.random() * 1.6 + 0.8),
+    vx: (Math.random() - 0.5) * 0.8,
+    vy: - (Math.random() * 1.8 + 0.6),
     life: Math.random() * 1.2 + 0.6,
     age: 0,
     size: Math.random() * 18 + 8,
@@ -67,21 +64,21 @@ function createFireParticle(x, y) {
 }
 
 function stepFire(dt) {
-  if (!fireCtx || !fireCanvas) return;
+  if (!fireCtx || !fireCanvas || !heroBanner) return;
   const w = fireCanvas.width / dpr;
   const h = fireCanvas.height / dpr;
 
-  // gentle clear (low alpha) to create trails
-  fireCtx.fillStyle = 'rgba(0,0,0,0.25)';
+  // gentle fade => low alpha so it doesn't black out the banner
+  fireCtx.fillStyle = 'rgba(0,0,0,0.12)';
   fireCtx.fillRect(0, 0, w, h);
 
-  // spawn
-  const spawnRate = 6;
+  // spawn particles near bottom center of hero
+  const spawnRate = 5;
   for (let i = 0; i < spawnRate; i++) {
     const px = w * (0.45 + Math.random() * 0.1);
-    const py = h * (0.9 + Math.random() * 0.05);
+    const py = h * (0.88 + Math.random() * 0.08);
     fireParticles.push(createFireParticle(px, py));
-    if (fireParticles.length > 800) fireParticles.shift();
+    if (fireParticles.length > 600) fireParticles.shift();
   }
 
   for (let i = fireParticles.length - 1; i >= 0; i--) {
@@ -99,10 +96,10 @@ function stepFire(dt) {
 
     const grad = fireCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size);
     const hue = Math.floor(p.hue);
-    grad.addColorStop(0, `hsla(${hue}, 100%, 65%, ${alpha})`);
-    grad.addColorStop(0.4, `hsla(${hue + 20}, 90%, 50%, ${alpha * 0.7})`);
-    grad.addColorStop(0.8, `hsla(${hue + 40}, 80%, 40%, ${alpha * 0.4})`);
-    grad.addColorStop(1, `hsla(${hue + 40}, 80%, 30%, 0)`);
+    grad.addColorStop(0, `hsla(${hue},100%,65%,${alpha})`);
+    grad.addColorStop(0.4, `hsla(${hue+20},90%,50%,${alpha*0.7})`);
+    grad.addColorStop(0.8, `hsla(${hue+40},80%,40%,${alpha*0.35})`);
+    grad.addColorStop(1, `hsla(${hue+40},80%,30%,0)`);
 
     fireCtx.globalCompositeOperation = 'lighter';
     fireCtx.fillStyle = grad;
@@ -114,11 +111,11 @@ function stepFire(dt) {
 }
 
 let lastFireTime = 0;
-function fireLoop(timestamp) {
+function fireLoop(ts) {
   if (!fireRunning) return;
-  if (!lastFireTime) lastFireTime = timestamp;
-  const dt = Math.min((timestamp - lastFireTime) / 1000, 0.05);
-  lastFireTime = timestamp;
+  if (!lastFireTime) lastFireTime = ts;
+  const dt = Math.min((ts - lastFireTime) / 1000, 0.05);
+  lastFireTime = ts;
   stepFire(dt);
   fireAnimId = requestAnimationFrame(fireLoop);
 }
@@ -139,71 +136,71 @@ function stopFire() {
     cancelAnimationFrame(fireAnimId);
     fireAnimId = null;
   }
-  // CLEAR canvas now (do not paint an opaque rectangle)
   if (fireCtx && fireCanvas) {
     fireCtx.clearRect(0, 0, fireCanvas.width / dpr, fireCanvas.height / dpr);
     fireParticles = [];
   }
 }
 
-/* LIGHTNING system */
-let ctx = lightningCanvas ? lightningCanvas.getContext('2d') : null;
+/* ---------- LIGHTNING (localized to hero) ---------- */
+let lightningCtx = lightningCanvas ? lightningCanvas.getContext('2d') : null;
 let lightningRaf = null;
 let lastStrike = 0;
 let nextStrikeIn = Math.random() * (4500 - 800) + 800;
 let lightningActive = false;
 
-function drawLightningStrike() {
-  if (!ctx || !lightningCanvas) return;
+function drawLightningStrikeLocal() {
+  if (!lightningCtx || !lightningCanvas) return;
   const w = lightningCanvas.width / dpr;
   const h = lightningCanvas.height / dpr;
-  ctx.beginPath();
-  ctx.strokeStyle = "rgba(125,249,255,0.95)";
-  ctx.lineWidth = 2;
+  lightningCtx.beginPath();
+  lightningCtx.strokeStyle = "rgba(180,230,255,0.95)";
+  lightningCtx.lineWidth = 1.6;
   let x = Math.random() * w;
   let y = 0;
-  ctx.moveTo(x, y);
+  lightningCtx.moveTo(x, y);
   while (y < h) {
     x += (Math.random() - 0.5) * 120;
     y += Math.random() * 40 + 20;
-    ctx.lineTo(x, y);
+    lightningCtx.lineTo(x, y);
   }
-  ctx.stroke();
+  lightningCtx.stroke();
 
   if (Math.random() > 0.6) {
-    ctx.beginPath();
-    ctx.strokeStyle = "rgba(200,255,255,0.6)";
-    ctx.lineWidth = 1;
+    lightningCtx.beginPath();
+    lightningCtx.strokeStyle = "rgba(220,245,255,0.6)";
+    lightningCtx.lineWidth = 1;
     let bx = Math.random() * w;
     let by = Math.random() * (h * 0.6);
-    ctx.moveTo(bx, by);
+    lightningCtx.moveTo(bx, by);
     for (let i = 0; i < 5; i++) {
       bx += (Math.random() - 0.5) * 40;
       by += Math.random() * 40;
-      ctx.lineTo(bx, by);
+      lightningCtx.lineTo(bx, by);
     }
-    ctx.stroke();
+    lightningCtx.stroke();
   }
 }
 
-function lightningStep(timestamp) {
-  if (!ctx || !lightningCanvas) return;
-  ctx.fillStyle = 'rgba(0,0,0,0.08)';
-  ctx.fillRect(0, 0, lightningCanvas.width / dpr, lightningCanvas.height / dpr);
+function lightningStep(ts) {
+  if (!lightningCtx || !lightningCanvas) return;
+  // very subtle fade so lines persist briefly but don't hide image
+  lightningCtx.fillStyle = 'rgba(0,0,0,0.04)';
+  lightningCtx.fillRect(0, 0, lightningCanvas.width / dpr, lightningCanvas.height / dpr);
 
-  if (!lastStrike) lastStrike = timestamp;
-  const elapsed = timestamp - lastStrike;
+  if (!lastStrike) lastStrike = ts;
+  const elapsed = ts - lastStrike;
   if (elapsed > nextStrikeIn) {
     const flashes = Math.random() > 0.75 ? Math.floor(Math.random() * 3) + 1 : 1;
-    for (let i = 0; i < flashes; i++) drawLightningStrike();
-    lastStrike = timestamp;
+    for (let i = 0; i < flashes; i++) drawLightningStrikeLocal();
+    lastStrike = ts;
     nextStrikeIn = Math.random() * (6000 - 1200) + 1200;
   }
   lightningRaf = requestAnimationFrame(lightningStep);
 }
 
 function startLightning() {
-  if (!ctx || lightningActive) return;
+  if (!lightningCtx || lightningActive) return;
   lightningActive = true;
   lastStrike = 0;
   lightningRaf = requestAnimationFrame(lightningStep);
@@ -216,12 +213,12 @@ function stopLightning() {
     cancelAnimationFrame(lightningRaf);
     lightningRaf = null;
   }
-  if (ctx && lightningCanvas) {
-    ctx.clearRect(0, 0, lightningCanvas.width / dpr, lightningCanvas.height / dpr);
+  if (lightningCtx && lightningCanvas) {
+    lightningCtx.clearRect(0, 0, lightningCanvas.width / dpr, lightningCanvas.height / dpr);
   }
 }
 
-/* Sequence: Fire -> Storm */
+/* ---------- Sequence ---------- */
 function runSequence() {
   if (prefersReduced) return;
   setTimeout(() => {
@@ -233,19 +230,12 @@ function runSequence() {
   }, FIRE_DELAY_MS);
 }
 
-if (!prefersReduced) {
-  if (lightningCanvas) {
-    resizeCanvas(lightningCanvas);
-    ctx && ctx.clearRect(0, 0, lightningCanvas.width / dpr, lightningCanvas.height / dpr);
-  }
-  if (fireCanvas) {
-    resizeCanvas(fireCanvas);
-    fireCtx && fireCtx.clearRect(0, 0, fireCanvas.width / dpr, fireCanvas.height / dpr);
-  }
+// start sequence if canvases present
+if (!prefersReduced && heroBanner && (fireCanvas || lightningCanvas)) {
   runSequence();
 }
 
-/* Countdown */
+/* ---------- Countdown (unchanged) ---------- */
 const countdown = document.getElementById('countdown');
 let countdownTimer = null;
 
@@ -292,7 +282,7 @@ function startCountdown() {
 }
 startCountdown();
 
-/* Intro & register open */
+/* ---------- Intro & register open ---------- */
 const intro = document.getElementById('intro');
 const enterBtn = document.getElementById('intro-enter');
 
@@ -324,13 +314,12 @@ if (enterBtn) {
   });
 }
 
-/* Mobile nav toggle */
-const navToggle = document.querySelector('.nav-toggle');
-const navLinks = document.getElementById('nav-links');
-if (navToggle && navLinks) {
-  navToggle.addEventListener('click', () => {
-    const expanded = navToggle.getAttribute('aria-expanded') === 'true';
-    navToggle.setAttribute('aria-expanded', String(!expanded));
-    navLinks.hidden = expanded;
-  });
-}
+/* ---------- Visibility handling ---------- */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stopFire();
+    stopLightning();
+  } else {
+    if (lightningActive && !prefersReduced) startLightning();
+  }
+});
