@@ -7,36 +7,26 @@
   <meta name="description" content="Phoenix AI StormFest — four days of workshops, hackathon and a concert night. University-driven techno-cultural movement in Nagpur.">
   <meta name="theme-color" content="#000000">
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Phoenix AI StormFest 2025">
-  <meta property="og:description" content="Four days of innovation, competition, learning and music — Nagpur · 25–28 January 2025">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Phoenix AI StormFest">
-
-  <!-- Preconnect/Preload fonts for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
-
-  <!-- Favicons & manifest (placeholders) -->
-  <link rel="icon" href="/favicon.ico">
-  <link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
 
-  <!-- Skip link for keyboard users -->
   <a class="skip" href="#main">Skip to content</a>
 
-  <!-- Canvas visual effect (presentation only) -->
-  <canvas id="lightning" role="presentation" aria-hidden="true"></canvas>
+  <!-- Fire canvas (appears over hero when triggered) -->
+  <canvas id="fire" aria-hidden="true" role="presentation"></canvas>
+
+  <!-- Lightning canvas (storm) -->
+  <canvas id="lightning" aria-hidden="true" role="presentation"></canvas>
 
   <!-- INTRO (dismissible) -->
   <div id="intro" aria-hidden="false">
     <h1>PHOENIX AI</h1>
     <p>StormFest 2025</p>
-    <!-- This button opens the register page in a new tab and then dismisses the intro -->
     <button id="intro-enter" aria-label="Enter site">Enter the Storm</button>
   </div>
 
@@ -46,7 +36,6 @@
         <a href="#main" class="logo">PHOENIX AI</a>
         <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links">Menu</button>
         <div id="nav-links" class="nav-links" hidden>
-          <!-- Register now links to the separate register page -->
           <a href="register.html" target="_blank" rel="noopener">Register</a>
           <a href="#sponsor">Sponsor</a>
           <a href="#events">Events</a>
@@ -54,24 +43,26 @@
       </nav>
     </header>
 
-    <!-- HERO -->
+    <!-- HERO with banner image -->
     <section class="hero" aria-labelledby="hero-heading">
-      <h2 id="hero-heading">WHERE<br><span>INNOVATION</span><br>RISES</h2>
-      <p>25–28 January 2025 · Nagpur</p>
-      <div class="buttons">
-        <!-- Primary opens register.html in a new tab so registration is on a separate page -->
-        <a class="primary" href="register.html" target="_blank" rel="noopener">ENTER THE STORM</a>
-        <a href="#sponsor" class="outline">BECOME A SPONSOR</a>
+      <div class="hero-banner" role="img" aria-label="Rise & Reborn Festival banner">
+        <img src="assets/images/banner.jpg" alt="Rise & Reborn Festival banner — phoenix artwork" />
+        <div class="hero-overlay">
+          <h2 id="hero-heading">WHERE<br><span>INNOVATION</span><br>RISES</h2>
+          <p>25–28 January 2025 · Nagpur</p>
+          <div class="buttons">
+            <a class="primary" href="register.html" target="_blank" rel="noopener">ENTER THE STORM</a>
+            <a href="#sponsor" class="outline">BECOME A SPONSOR</a>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- COUNTDOWN -->
     <section class="section" aria-labelledby="countdown-heading">
       <h3 id="countdown-heading">The Storm Begins In</h3>
       <div id="countdown" role="status" aria-live="polite" data-target="2025-01-25T09:00:00Z"></div>
     </section>
 
-    <!-- ABOUT -->
     <section class="section dark" aria-labelledby="about-heading">
       <h3 id="about-heading">The Storm Begins</h3>
       <p>
@@ -81,7 +72,6 @@
       </p>
     </section>
 
-    <!-- EVENTS -->
     <section id="events" class="section" aria-labelledby="events-heading">
       <h3 id="events-heading">Four Days. One Storm.</h3>
       <div class="cards">
@@ -100,7 +90,6 @@
       </div>
     </section>
 
-    <!-- SPONSOR -->
     <section class="section dark" id="sponsor" aria-labelledby="sponsor-heading">
       <h3 id="sponsor-heading">Partner With Power</h3>
       <p>
@@ -109,8 +98,6 @@
       </p>
       <p><a href="mailto:sponsor@phoenixfest.example" class="outline">Contact Sponsorship</a></p>
     </section>
-
-    <!-- NOTE: REGISTER section has been moved to a dedicated file (register.html) -->
   </main>
 
   <footer>
